@@ -3,6 +3,7 @@ const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 const { isPasswordValid } = require('../../utils/checkInputValidity');
 const Wishlist = require('../../models/Wishlist');
+const { errorLogger } = require('../../middleware/errorHandler');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -85,8 +86,8 @@ const updateUserRoles = async (req, res) => {
         }
         else
             return res.status(400).json({ message: "Invalid input data" });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
     }
 }
 

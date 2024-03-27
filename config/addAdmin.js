@@ -47,7 +47,6 @@ const addAdmin = async () => {
         await session.commitTransaction();
     } catch (err) {
         await session.abortTransaction();
-        console.log(err);
         errorLogger(err);
     }
     finally {

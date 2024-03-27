@@ -82,16 +82,14 @@ const strValToNumVal = (obj) => {
 
 const strValToNumArr = (str) => {
     const strArr = str.split(',');
-    console.log(strArr)
     let numArr = strArr.map((s) => Number(s));
-    console.log(numArr);
     numArr = numArr.filter((num) => !Number.isNaN(num) && num !== 0);
     return numArr.map((n) => Number.parseInt(n, 10));
 }
 
 const generateVerificationCode = () => {
-    const min = 100000; // Minimum 6-digit number
-    const max = 999999; // Maximum 6-digit number
+    const min = 100000;
+    const max = 999999;
     return String(Math.floor(Math.random() * (max - min + 1)) + min);
 }
 

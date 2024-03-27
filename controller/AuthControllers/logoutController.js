@@ -1,3 +1,4 @@
+const { errorLogger } = require('../../middleware/errorHandler');
 const User = require('../../models/User');
 const { res500 } = require('../../utils/errorResponse');
 const { res204 } = require('../../utils/genericResponse');
@@ -23,7 +24,7 @@ const handleLogout = async (req, res) => {
         return res.status(204).json({ "message": "You are logged out successfully" });
     }
     catch (err) {
-        console.log(err);
+        errorLogger(err);
         res500(res);
     }
 

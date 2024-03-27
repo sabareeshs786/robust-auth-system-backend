@@ -1,3 +1,4 @@
+const { errorLogger } = require('../../middleware/errorHandler');
 const Profile = require('../../models/Profile');
 const { isValidPhoneNumber, isValidName, getIntVal, isValidAddress } = require('../../utils/utilFunctions');
 
@@ -12,8 +13,8 @@ const getPersonalInfo = async (req, res) => {
             return res.status(404).json({ 'message': 'Profile not found' });
         }
         res.json(personalInfo);
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         res.status(500);
     }
 }
@@ -27,8 +28,8 @@ const getAddresses = async (req, res) => {
         if (!addressesInfo)
             return res.status(404).json({ message: 'Profile not found' });
         res.status(200).json(addressesInfo);
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         res.status(500);
     }
 }
@@ -105,8 +106,8 @@ const updatePersonalInfo = async (req, res) => {
         }
         else
             return res.status(400).json({ message: "Invalid input data" });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -132,8 +133,8 @@ const addAddress = async (req, res) => {
             return res.status(201).json({ message: "Address added successfully" });
         else
             return res.status(401).json({ message: "Cannot add address" });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -161,8 +162,8 @@ const updateAddress = async (req, res) => {
             return res.status(204).json({ message: "Address updated successfully" });
         else
             return res.status(200).json({ message: "Same address entered" });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         res.status(500).json({ message: "Internal server error" });
     }
 }

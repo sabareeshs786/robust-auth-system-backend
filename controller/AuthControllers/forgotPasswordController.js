@@ -3,6 +3,7 @@ const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 const { res500 } = require('../../utils/errorResponse');
 const { generateVerificationCode } = require('../../utils/utilFunctions');
 const { sendEmail } = require('../../utils/emailSender');
+const { errorLogger } = require('../../middleware/errorHandler');
 
 const handleForgotPassword = async (req, res) => {
     try {
@@ -27,7 +28,7 @@ const handleForgotPassword = async (req, res) => {
         return res.status(200).json({message: "Verification code is sent to your email address"});
     }
     catch (err) {
-        console.log(err);
+        errorLogger(err);
         return res500(res);
     }
 }

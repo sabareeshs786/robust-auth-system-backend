@@ -6,7 +6,7 @@ const cors = require('cors');
 
 // Custom modules
 const corsOptions = require('./config/corsOptions');
-const { logger } = require('./middleware/logEvents');
+const { logger, successLog } = require('./middleware/logEvents');
 const {errorHandler} = require('./middleware/errorHandler');
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
@@ -55,7 +55,6 @@ app.use(verifyJWT);
 app.use('/users', require('./routes/api/users'));
 app.use('/admin', require('./routes/api/admins'));
 app.use('/profile', require('./routes/api/profile'));
-app.use('/wishlist', require('./routes/api/wishlist'));
 
 app.all('*', (req, res) => {
     res.status(404);
@@ -71,7 +70,7 @@ app.all('*', (req, res) => {
 app.use(errorHandler);
 
 mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
+    successLog('Connected to MongoDB');
     // addAdmin();
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => successLog(`Server running on port ${PORT}`));
 });

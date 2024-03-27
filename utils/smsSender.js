@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { SNSClient, PublishCommand } = require('@aws-sdk/client-sns');
+const { errorLogger } = require('../middleware/errorHandler');
+const { successLog } = require('../middleware/logEvents');
 
 const sendSms = async (phno, mes) => {
     try {
@@ -29,10 +31,10 @@ const sendSms = async (phno, mes) => {
     
         // Send the SMS message using the SNS client and the created command
         const message = await sns.send(command);
-        console.log("Message sent:", message);
+        successLog("Message sent:", message);
         return true;
-    } catch (error) {
-        console.log("Error sending message:", error);
+    } catch (err) {
+        errorLogger("Error sending the message " + err);
         return false;
     }
 }

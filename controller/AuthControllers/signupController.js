@@ -8,6 +8,7 @@ const { isPasswordValid } = require('../../utils/checkInputValidity');
 const { res400 } = require('../../utils/errorResponse');
 const { sendEmail } = require('../../utils/emailSender');
 const { generateVerificationCode } = require('../../utils/utilFunctions');
+const { errorLogger } = require('../../middleware/errorHandler');
 
 const handleNewUser = async (req, res) => {
     const session = await mongoose.startSession();
@@ -55,7 +56,7 @@ const handleNewUser = async (req, res) => {
         res.status(201).json({ message: `Verification code is sent to ${email}` });
     } catch (err) {
         await session.abortTransaction();
-        console.log(err);
+        errorLogger(err);
         if(err.code && err.message)
             return res.status(err.code).json({message: err.message});
         else

@@ -1,5 +1,7 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const { errorLogger } = require('../middleware/errorHandler');
+const { successLog } = require('../middleware/logEvents');
 const emailId = process.env.EMAIL_ID;
 const password = process.env.PASSWORD;
 
@@ -21,12 +23,12 @@ const sendEmail = async (to, subject, text) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
+    successLog('Email sent: ' + info.response);
     
     return true;
 
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    errorLogger(err);
     return false;
   }
   

@@ -7,6 +7,8 @@ const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 const mongoose = require('mongoose');
 const { generateVerificationCode } = require('../../utils/utilFunctions');
 const { sendEmail } = require('../../utils/emailSender');
+const { errorLogger } = require('../../middleware/errorHandler');
+const { successLog } = require('../../middleware/logEvents');
 
 const handleEmailVerification = async (req, res) => {
     const session = await mongoose.startSession();
@@ -56,7 +58,7 @@ const handleEmailVerification = async (req, res) => {
 
     } catch (err) {
         await session.abortTransaction();
-        console.log(err);
+        errorLogger(err);
         if(err.code && err.message)
             res.status(err.code).json({'message': err.message});
         else
@@ -92,8 +94,8 @@ const handleForgotPasswordCode = async (req, res) => {
             return res.status(400).json({message: "Invalid verification code"});
         }
 
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         return res.status(500).json({message: "Internal server error"});
     }    
 }
@@ -124,9 +126,9 @@ const handleResendVC = async (req, res) => {
 
         const result = await verCodeCollection.findOneAndDelete({ email });
         if (result) {
-            console.log('Document deleted successfully');
+            successLog('Document deleted successfully');
         } else {
-            console.log('Document not found');
+            successLog('Document not found');
         }
 
         // Generate new verification code
@@ -143,8 +145,8 @@ const handleResendVC = async (req, res) => {
 
         return res.status(200).json({message: "Verification code sent successfully"});
 
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        errorLogger(err);
         return res.status(500).json({ 'message': "Internal server error occurred!!!\n Try again later" });
     }
 }

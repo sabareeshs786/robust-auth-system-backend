@@ -1,3 +1,4 @@
+const { errorLogger } = require("../../middleware/errorHandler");
 const { sendSms } = require("../../utils/smsSender");
 
 const handleSendSms = async (req, res) => {
@@ -9,7 +10,7 @@ const handleSendSms = async (req, res) => {
         return res.status(200).json({message: "Message sent"});
     return res.status(400).json({message: "Message not sent"});
     } catch (error) {
-        console.log(error);
+        errorLogger(error);
         return res.sendStatus(500);
     }
 }

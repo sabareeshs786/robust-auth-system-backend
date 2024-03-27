@@ -16,7 +16,7 @@ const logEvents = async (message, logName) => {
 
         await fsPromises.appendFile(path.join(__dirname, '..', 'logs', logName), logItem);
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 }
 
@@ -26,4 +26,9 @@ const logger = (req, res, next) => {
     next();
 }
 
-module.exports = { logger, logEvents };
+const successLog = (message) => {
+    logEvents(message, 'successLog.txt');
+    console.log(message);
+}
+
+module.exports = { logger, logEvents, successLog };
