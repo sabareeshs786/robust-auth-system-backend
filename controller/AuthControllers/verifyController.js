@@ -1,7 +1,6 @@
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
-const Wishlist = require('../../models/Wishlist');
-const EmailVerificationCodes = require('../../models/EmailVC');
+const EmailVerificationCodes = require('../../models/VerificationCodes');
 const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 
 const mongoose = require('mongoose');
@@ -45,9 +44,7 @@ const handleEmailVerification = async (req, res) => {
             const profile = await Profile.create([{
                 userid,
             }], { session });
-            const wishlist = await Wishlist.create([{
-                userid
-            }], { session });
+            
             const emailVerification = await EmailVerificationCodes.deleteOne({email});
 
             await session.commitTransaction();

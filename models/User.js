@@ -9,7 +9,16 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: function() {
+      return !this.phno || this.phno.length === 0;
+    },
+    unique: true
+  },
+  phno: {
+    type: String,
+    required: function() {
+      return !this.email || this.email.length === 0;
+    },
     unique: true
   },
   roles: {

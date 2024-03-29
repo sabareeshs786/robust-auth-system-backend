@@ -10,8 +10,13 @@ function isvalidInputData(dataObject) {
     return true;
 }
 
+function isValidEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
 function isValidPhoneNumber(phoneNumber) {
-    let phoneRegex = /^\d{10}$/;
+    const phoneRegex = /^\+\d{1,3}\s\d{4,}$/;
     return phoneRegex.test(phoneNumber);
 }
 
@@ -96,4 +101,4 @@ const generateVerificationCode = () => {
 module.exports = { isvalidInputData, removeEmptyFields, 
     strValToNumVal, strValToNumArr, isValidPhoneNumber, 
     isValidName, getNumVal, getIntVal, isValidAddress,
-    generateVerificationCode };
+    generateVerificationCode, isValidEmail };

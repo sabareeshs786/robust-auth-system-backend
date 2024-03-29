@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const Counter = require('../models/Counter');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
-const Wishlist = require('../models/Wishlist');
 const mongoose = require('mongoose');
 const { errorLogger } = require('../middleware/errorHandler');
 
@@ -39,9 +38,6 @@ const addAdmin = async () => {
         }], { session });
         const profile = await Profile.create([{
             "userid": counter.value,
-        }], { session });
-        const wishlist = await Wishlist.create([{
-            "userid": counter.value
         }], { session });
 
         await session.commitTransaction();

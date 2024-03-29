@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 const { isPasswordValid } = require('../../utils/checkInputValidity');
-const Wishlist = require('../../models/Wishlist');
 const { errorLogger } = require('../../middleware/errorHandler');
 
 const getAllUsers = async (req, res) => {
@@ -103,7 +102,6 @@ const deleteUser = async (req, res) => {
         
         await User.deleteOne({ userid });
         await Profile.deleteOne({userid});
-        await Wishlist.deleteOne({userid});
 
         res.status(203).json({ message: "User deleted successfully" });
     } catch (error) {
