@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const { isPasswordValid } = require('../../utils/checkInputValidity');
 const { res400 } = require('../../utils/errorResponse');
 const { sendEmail } = require('../../utils/emailSender');
-const { generateVerificationCode, isValidEmail, isValidPhoneNumber } = require('../../utils/utilFunctions');
+const { generateVerificationCode, getField } = require('../../utils/utilFunctions');
 const { errorLogger } = require('../../middleware/errorHandler');
 const { sendSms } = require('../../utils/smsSender');
 
@@ -18,18 +18,14 @@ const handleNewUser = async (req, res) => {
     try {
         const { emailPhno, pwd, cpwd } = req.body;
         if (!emailPhno || !pwd || !cpwd) return res.status(400).json({ 'message': 'Invalid input data' });
-        let field;
-        if(isValidEmail(emailPhno)){
-            field = "email";
-        }
-        else if(isValidPhoneNumber(emailPhno)){
-            field = "phno";
-        }
-        else
+        const field = getField(emailPhno);
+        if(!field)
             return res.status(500).json({message: "Invalid input data"});
 
         const duplicate = await User.findOne({ [field]: emailPhno }).exec();
-        if (duplicate) return res.status(409).json({ "message": `The entered ${field === "email" ? "Email id" : "Phone number"} is already present` });
+        if (duplicate && duplicate.verified) return res.status(409).json({ "message": `The entered ${field === "email" ? "Email id" : "Phone number"} is already present` });
+        else if(duplicate && !duplicate.verified)
+            return res.status(401).json({message : `${field === "email" ? "Email id" : "Phone number"} is present but not verified`});
 
         const passwordValidity = isPasswordValid(pwd);
         if (!passwordValidity) return res400(res, "Invalid password entered");
@@ -65,7 +61,7 @@ const handleNewUser = async (req, res) => {
             }
         }
 
-        await VerificationCodes.create([{
+        const vc = await VerificationCodes.create([{
             "userid": user[0].userid,
             "code": code
         }], { session });

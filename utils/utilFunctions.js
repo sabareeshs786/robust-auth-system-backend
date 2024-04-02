@@ -98,7 +98,18 @@ const generateVerificationCode = () => {
     return String(Math.floor(Math.random() * (max - min + 1)) + min);
 }
 
+const getField = (emailPhno) => {
+    if(isValidEmail(emailPhno)){
+        return "email";
+    }
+    else if(isValidPhoneNumber(emailPhno)){
+        return "phno";
+    }
+    else
+        return null;
+}
+
 module.exports = { isvalidInputData, removeEmptyFields, 
     strValToNumVal, strValToNumArr, isValidPhoneNumber, 
     isValidName, getNumVal, getIntVal, isValidAddress,
-    generateVerificationCode, isValidEmail };
+    generateVerificationCode, isValidEmail, getField };

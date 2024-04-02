@@ -1,34 +1,35 @@
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
-const EmailVerificationCodes = require('../../models/VerificationCodes');
+const VerificationCodes = require('../../models/VerificationCodes');
 const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 
 const mongoose = require('mongoose');
-const { generateVerificationCode } = require('../../utils/utilFunctions');
+const { generateVerificationCode, getField } = require('../../utils/utilFunctions');
 const { sendEmail } = require('../../utils/emailSender');
 const { errorLogger } = require('../../middleware/errorHandler');
 const { successLog } = require('../../middleware/logEvents');
 
-const handleEmailVerification = async (req, res) => {
+const handleVerification = async (req, res) => {
     const session = await mongoose.startSession();
     await session.startTransaction();
 
     try {
-        const email = req.body?.email;
-        const code = req.body?.code;
-        if(!email || !code) throw {code: 400, message: "Invalid email id or verification code"};
+        const {emailPhno, code} = req.body;
+        if(!emailPhno || !code) throw {code: 400, message: "Invalid email id or verification code"};
 
-        const result = await EmailVerificationCodes.findOne({email}).exec();
-        const user = await User.findOne({email}).exec();
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
 
+        const user = await User.findOne({[field] : emailPhno}).exec();
         if(!user)
             throw {code: 400, message: "Invalid email id"};
         if(user.verified)
             throw {code: 200, message: "Email already verified"};
-        if(!result)
-            throw {code: 400, message: "Verification code expired"};
 
         const userid = user.userid;
+        const result = await VerificationCodes.findOne({userid}).exec();
+        if(!result)
+            throw {code: 400, message: "Verification code expired"};
 
         if(result?.code === code){
             const updateduser = await User.updateOne(
@@ -45,10 +46,10 @@ const handleEmailVerification = async (req, res) => {
                 userid,
             }], { session });
             
-            const emailVerification = await EmailVerificationCodes.deleteOne({email});
+            const emailVerification = await VerificationCodes.deleteOne({userid});
 
             await session.commitTransaction();
-            res.status(201).json({ message: `Email verified successfully` });
+            res.status(201).json({ message: `${field === "email" ? "Email id" : "Phone number"} verified successfully` });
         }
         else
             throw {code: 400, message: "Invalid verification code entered"};
@@ -70,17 +71,22 @@ const handleEmailVerification = async (req, res) => {
 
 const handleForgotPasswordCode = async (req, res) => {
     try {
-        const email = req.body?.email;
-        const code = req.body?.code;
-        if(!email || !code) return res.status(400).json({message: "Invalid email id or verification code"});
+        const {emailPhno, code} = req.body;
+        if(!emailPhno || !code) return res.status(400).json({message: "Invalid input data"});
 
-        const user = await User.findOne({email}).exec();
-        if(!user) return res.status(400).json({message: "Invalid email address entered"});
-        const result = await FPasswordVerificationCodes.findOne({email}).exec();
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
+
+        const user = await User.findOne({[field]: emailPhno}).exec();
+        if(!user) return res.status(400).json({message: `Invalid ${field === "email" ? "Email id" : "Phone number"} entered`});
+        
+        const userid = user.userid;
+
+        const result = await FPasswordVerificationCodes.findOne({userid}).exec();
         if(!result) return res.status(400).json({message: "Verification code expired"});
 
         if(result?.code === code){
-            await FPasswordVerificationCodes.updateOne({email}, {
+            await FPasswordVerificationCodes.updateOne({userid}, {
                 $set: {
                     verified: true
                 }
@@ -98,45 +104,53 @@ const handleForgotPasswordCode = async (req, res) => {
 }
 
 const handleResendVC = async (req, res) => {
-    const email = req.body?.email;
-    const purpose = req.body?.purpose;
+    const {emailPhno,purpose } = req.body;
+
     try {
-        const purposes = ["email", "password"];
-        if(!email || !purpose || !purposes.includes(purpose)) return res.status(400).json({message: "Invalid input data"});
+        const purposes = ["emailPhno", "password"];
+        if(!emailPhno || !purpose || !purposes.includes(purpose)) return res.status(400).json({message: "Invalid input data"});
 
-        const user = await User.findOne({email}).exec();
-        if(!user) return res.status(400).json({message: "Invalid email address entered"});
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
 
+        const user = await User.findOne({[field]: emailPhno}).exec();
+        if(!user) return res.status(400).json({message: `Invalid ${field === "email" ? "Email id" : "Phone number"} entered`});
+        
+        const userid = user.userid;
         let verCodeCollection;
         let subject, text;
-        if(purpose === "email"){
-            if(user.verified) return res.status(200).json({message: "Email id already verified"});
-            verCodeCollection = EmailVerificationCodes;
+
+        if(purpose === "emailPhno"){
+            if(user.verified) return res.status(200).json({message: `${field === "email" ? "Email id" : "Phone number"} already verified`});
+            verCodeCollection = VerificationCodes;
             subject = "Verification code";
-            text = "Your email verification code is";
+            text = `Your ${field === "email" ? "Email id" : "Phone number"} verification code is `;
         }
         else{
             verCodeCollection = FPasswordVerificationCodes;
             subject = "Verification code to reset password";
-            text = "The code to reset the password is";
+            text = "The code to reset the password is ";
         }
 
-        const result = await verCodeCollection.findOneAndDelete({ email });
-        if (result) {
-            successLog('Document deleted successfully');
-        } else {
-            successLog('Document not found');
-        }
+        const result = await verCodeCollection.findOneAndDelete({ userid });
 
         // Generate new verification code
         const code = generateVerificationCode();
-        const isSent = await sendEmail(email, subject, `${text} ${code}`);
-
-        if(!isSent)
-            throw {message: "Can't send email"};
+        if(field === "email"){
+            const isSent = await sendEmail(emailPhno, subject, `${text}${code}`);
+            if(!isSent)
+                throw {code: 401, message: "Can't send email"};
+        }
+        else{
+            const phno = emailPhno.replace(/\s/g, '');
+            const result = await sendSms(phno, `${text}${code}`);
+            if(!result){
+                throw {code: 401, message: "Can't send SMS"};
+            }
+        }
 
         await verCodeCollection.create([{
-            "email": email,
+            "userid": userid,
             "code": code
         }]);
 
@@ -148,4 +162,4 @@ const handleResendVC = async (req, res) => {
     }
 }
 
-module.exports = { handleEmailVerification, handleForgotPasswordCode, handleResendVC };
+module.exports = { handleVerification, handleForgotPasswordCode, handleResendVC };

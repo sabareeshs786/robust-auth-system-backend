@@ -21,6 +21,7 @@ const handleLogout = async (req, res) => {
         const result = await foundUser.save();
         if (!result) return res500(res);
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+        res.json({ accessToken: '' });
         return res.status(204).json({ "message": "You are logged out successfully" });
     }
     catch (err) {

@@ -8,12 +8,18 @@ const { res500 } = require('../../utils/errorResponse');
 
 const handleResetPassword = async (req, res) => {
     try {
-        const { email, pwd, cpwd } = req.body;
-        if (!email || !pwd || !cpwd) return res.status(400).json({message: "Invalid input data"});
+        const { emailPhno, pwd, cpwd } = req.body;
+        if (!emailPhno || !pwd || !cpwd) return res.status(400).json({message: "Invalid input data"});
 
-        const foundUser = await User.findOne({ email: email }).exec();
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
+
+        const foundUser = await User.findOne({ [field]: emailPhno }).exec();
         if (!foundUser) return res.status(401).json({message: "User not found"});
-        const vc = await FPasswordVerificationCodes.findOne({email}).exec();
+
+        const userid = foundUser.userid;
+        
+        const vc = await FPasswordVerificationCodes.findOne({userid}).exec();
         if(!vc?.verified) return res.status(401).json({message: "Not verified"});
 
         const passwordValidity = isPasswordValid(pwd);
@@ -22,13 +28,13 @@ const handleResetPassword = async (req, res) => {
 
         const hashedPwd = await bcrypt.hash(pwd, 10);
         // if(foundUser.password === hashedPwd) return res400(res, "Old password entered");
-        await User.updateOne({userid: foundUser.userid}, 
+        await User.updateOne({userid}, 
         {
             $set: {
                 password: hashedPwd
             }
         }).exec();
-        await FPasswordVerificationCodes.findOneAndDelete({ email });
+        await FPasswordVerificationCodes.findOneAndDelete({ userid });
         return res.status(200).json({message: "Password changed successfully"});
     }
     catch (err) {

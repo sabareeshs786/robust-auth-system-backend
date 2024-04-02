@@ -7,24 +7,39 @@ const { errorLogger } = require('../../middleware/errorHandler');
 
 const handleForgotPassword = async (req, res) => {
     try {
-        const { email } = req.body;
-        if (!email) return res.status(400).json({message: "Invalid email id"});
+        const { emailPhno } = req.body;
+        if (!emailPhno) return res.status(400).json({message: "Invalid input data"});
 
-        const foundUser = await User.findOne({ email: email }).exec();
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
+        
+        const foundUser = await User.findOne({ [field]: emailPhno }).exec();
         if (!foundUser) return res.status(401).json({message: "User not found"});
+
+        const userid = foundUser.userid;
 
         // Send verification code
         const code = generateVerificationCode();
-        const isSent = await sendEmail(email, "Verification code to reset password", `The code to reset the password is ${code}`);
+        const text = "The code to reset the password is ";
+        if(field === "email"){
+            const isSent = await sendEmail(emailPhno, "Verification code to reset password", `${text}${code}`);
+            if(!isSent)
+                throw {code: 401, message: "Can't send email"};
+        }
+        else{
+            const phno = emailPhno.replace(/\s/g, '');
+            const result = await sendSms(phno, `${text}${code}`);
+            if(!result){
+                throw {code: 401, message: "Can't send SMS"};
+            }
+        }
 
-        if(!isSent)
-            throw {code: 401, message: "Can't send email"};
-
-        await FPasswordVerificationCodes.findOneAndDelete({ email });
+        await FPasswordVerificationCodes.findOneAndDelete({ userid });
         await FPasswordVerificationCodes.create([{
-            "email": email,
+            "userid": userid,
             "code": code
         }]);
+
         return res.status(200).json({message: "Verification code is sent to your email address"});
     }
     catch (err) {

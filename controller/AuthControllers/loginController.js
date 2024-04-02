@@ -5,10 +5,13 @@ const { res500 } = require('../../utils/errorResponse');
 
 const handleLogin = async (req, res) => {
     try {
-        const { email, pwd } = req.body;
-        if (!email || !pwd) return res.sendStatus(400);
+        const { emailPhno, pwd } = req.body;
+        if (!emailPhno || !pwd) return res.sendStatus(400);
 
-        const foundUser = await User.findOne({ email: email }).exec();
+        const field = getField(emailPhno);
+        if(!field) return res.status(400).json({message: "Invalid input data"});
+
+        const foundUser = await User.findOne({ [field]: emailPhno }).exec();
         if (!foundUser) return res.sendStatus(401);
 
         const match = await bcrypt.compare(pwd, foundUser.password);

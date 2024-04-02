@@ -40,7 +40,7 @@ app.post('/signup', signupController.handleNewUser);
 app.post('/login', loginController.handleLogin);
 app.get('/refresh', refreshController.handleRefreshToken);
 app.get('/logout', logoutController.handleLogout);
-app.post('/verify-email', verificationController.handleEmailVerification);
+app.post('/verify', verificationController.handleVerification);
 app.post('/forgot-password', forgotPasswordController.handleForgotPassword);
 app.post('/verify-forgot-password-code', verificationController.handleForgotPasswordCode);
 app.post('/reset-password', resetPasswordController.handleResetPassword);
