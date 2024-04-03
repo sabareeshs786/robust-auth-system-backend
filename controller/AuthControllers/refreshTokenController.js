@@ -19,7 +19,7 @@ const handleRefreshToken = async (req, res) => {
                 return res.status(403).json({"message": "You are not authorized\nTry logging in again"});
             const roles = Object.values(foundUser.roles).filter(Boolean);
             const accessToken = getAccessToken(decoded.userid, roles);
-            res.json({ roles, accessToken });
+            return res.status(200).json({ roles, accessToken });
         }
     );
 }

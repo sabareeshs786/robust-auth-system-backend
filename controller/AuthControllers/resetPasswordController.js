@@ -5,6 +5,7 @@ const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 const { isPasswordValid } = require('../../utils/checkInputValidity');
 const { res400 } = require('../../utils/errorResponse');
 const { res500 } = require('../../utils/errorResponse');
+const { getField } = require('../../utils/utilFunctions');
 
 const handleResetPassword = async (req, res) => {
     try {
@@ -27,6 +28,7 @@ const handleResetPassword = async (req, res) => {
         if (pwd !== cpwd) return res400(res, "Passwords doesn't match");
 
         const hashedPwd = await bcrypt.hash(pwd, 10);
+
         // if(foundUser.password === hashedPwd) return res400(res, "Old password entered");
         await User.updateOne({userid}, 
         {

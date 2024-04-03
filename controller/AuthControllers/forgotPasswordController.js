@@ -1,7 +1,7 @@
 const User = require('../../models/User');
 const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 const { res500 } = require('../../utils/errorResponse');
-const { generateVerificationCode } = require('../../utils/utilFunctions');
+const { generateVerificationCode, getField } = require('../../utils/utilFunctions');
 const { sendEmail } = require('../../utils/emailSender');
 const { errorLogger } = require('../../middleware/errorHandler');
 
