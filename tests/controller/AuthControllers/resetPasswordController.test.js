@@ -15,6 +15,7 @@ const createUser = async () => {
 describe('handleResetPassword', () => {
     beforeEach(async () => {
         await User.deleteMany({});
+        await ForgotPasswordVerificationCodes.deleteMany({});
     });
 
     it('should handle reset password when nothing is not given', async () => {
@@ -67,20 +68,58 @@ describe('handleResetPassword', () => {
         expect(res.status().json).toHaveBeenCalledWith({message: "User not found"});
     });
 
-    // it('should handle reset password for existing user', async () => {
-    //     const {user, refreshToken} = await createUser();
-    //     const req = {body: {emailPhno: process.env.TEST_EMAIL_ID}};
-    //     const res = {
-    //         json: jest.fn(),
-    //         status: jest.fn().mockReturnThis(),
-    //     };
+    it('should handle reset password for existing user by verification code not verified', async () => {
+        await createUser();
+        const req = {body: {emailPhno, pwd, cpwd}};
+        const res = {
+            json: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+        };
 
-    //     await handleResetPassword(req, res);
-    //     const count = await ForgotPasswordVerificationCodes.countDocuments({ userid: user.userid });
+        await handleResetPassword(req, res);
         
-    //     expect(count).toBe(1);
-    //     expect(res.status).toHaveBeenCalledWith(200);
-    //     expect(res.status().json).toHaveBeenCalledWith({message: "Verification code is sent to your email address"});
-    // });
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.status().json).toHaveBeenCalledWith({message: "Not verified"});
+    });
+
+    it('should handle reset password for existing user by verification code not verified', async () => {
+        const {user, refreshToken} = await createUser();
+        const fPasswordVC = new ForgotPasswordVerificationCodes({userid: user.userid, code: "123456"});
+        await fPasswordVC.save();
+
+        const req = {body: {emailPhno, pwd, cpwd}};
+        const res = {
+            json: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+        };
+
+        await handleResetPassword(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.status().json).toHaveBeenCalledWith({message: "Not verified"});
+    });
+
+    const passwordTests = [
+        {body: {emailPhno, pwd: "rrr", cpwd: "rrr"}, message: "Invalid password entered"},
+        {body: {emailPhno, pwd: "Password@1234", cpwd: "Password@123"}, message: "Passwords doesn't match"}
+    ];
+    passwordTests.forEach(({body, message}) => {
+        it('should handle reset password for existing user with invalid password', async () => {
+            const {user} = await createUser();
+            const fPasswordVC = new ForgotPasswordVerificationCodes({userid: user.userid, code: "123456", verified: true});
+            await fPasswordVC.save();
+    
+            const req = {body};
+            const res = {
+                json: jest.fn(),
+                status: jest.fn().mockReturnThis(),
+            };
+    
+            await handleResetPassword(req, res);
+            
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.status().json).toHaveBeenCalledWith({message});
+        });
+    });
 
 });
