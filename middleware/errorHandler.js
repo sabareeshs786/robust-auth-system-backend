@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
 
 const errorLogger = (err) => {
     logEvents(`${err.name}: ${err.message}`, 'errLog.txt');
-    console.error(err.stack);
+    console.error(err);
 }
 
 module.exports = {errorHandler, errorLogger};
