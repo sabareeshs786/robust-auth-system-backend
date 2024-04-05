@@ -15,14 +15,14 @@ const handleVerification = async (req, res) => {
 
     try {
         const {emailPhno, code} = req.body;
-        if(!emailPhno || !code) throw {code: 400, message: "Invalid email id or verification code"};
+        if(!emailPhno || !code) throw {code: 400, message: "Invalid input data"};
 
         const field = getField(emailPhno);
         if(!field) return res.status(400).json({message: "Invalid input data"});
 
         const user = await User.findOne({[field] : emailPhno}).exec();
         if(!user)
-            throw {code: 400, message: "Invalid email id"};
+            throw {code: 401, message: "User not found"};
         if(user.verified)
             throw {code: 200, message: "Email already verified"};
 
@@ -32,7 +32,7 @@ const handleVerification = async (req, res) => {
             throw {code: 400, message: "Verification code expired"};
 
         if(result?.code === code){
-            const updateduser = await User.updateOne(
+            await User.updateOne(
                 { userid },
                 {   
                     $set: {
@@ -42,11 +42,11 @@ const handleVerification = async (req, res) => {
                 { session }
             ).exec();
 
-            const profile = await Profile.create([{
+            await Profile.create([{
                 userid,
             }], { session });
             
-            const emailVerification = await VerificationCodes.deleteOne({userid});
+            await VerificationCodes.deleteOne({userid});
 
             await session.commitTransaction();
             res.status(201).json({ message: `${field === "email" ? "Email id" : "Phone number"} verified successfully` });

@@ -32,6 +32,7 @@ describe('handleResetPassword', () => {
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.status().json).toHaveBeenCalledWith({message: "Invalid input data"});
     });
+
     const emailPhno = process.env.TEST_EMAIL_ID;
     const pwd = "Password@123#";
     const cpwd = "Password@123#";
@@ -42,6 +43,7 @@ describe('handleResetPassword', () => {
         {emailPhno:null, pwd: null, cpwd}, {emailPhno: null, pwd, cpwd: null}, {emailPhno, pwd: null, cpwd: null},
         {emailPhno: "invalid email-id ph.no.", pwd, cpwd}
     ];
+    
     testCases.forEach((body) => {
         it("should handle reset password when given data is invalid or insufficient", async () => {
             const req = {body};
