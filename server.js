@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-export const app = express();
+const app = express();
 const path = require('path');
 const cors = require('cors');
 
