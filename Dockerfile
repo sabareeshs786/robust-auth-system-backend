@@ -1,7 +1,9 @@
-FROM node:20.11.1
+FROM alpine:latest
+RUN apk update
+RUN apk add --no-cache curl gnupg nodejs npm bash
 WORKDIR /app
 COPY package*.json ./
-RUN npm install 
+RUN npm install
 COPY . .
 EXPOSE 3500
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
