@@ -2,20 +2,22 @@ const User = require('../../models/User');
 const bcrypt = require('bcrypt');
 const { getAccessToken, getRefreshToken } = require('../../utils/getTokens');
 const { res500 } = require('../../utils/errorResponse');
+const { getField } = require('../../utils/utilFunctions');
 
 const handleLogin = async (req, res) => {
     try {
         const { emailPhno, pwd } = req.body;
-        if (!emailPhno || !pwd) return res.sendStatus(400);
+        if (!emailPhno || !pwd) return res.status(400).json({message: "Invalid Email id or password entered"});
 
         const field = getField(emailPhno);
-        if(!field) return res.status(400).json({message: "Invalid input data"});
+        const INVALID_USER = {message: `Invalid ${field === 'email' ? "Email id": "Phone number"} or password entered`};
+        if(!field) return res.status(400).json(INVALID_USER);
 
         const foundUser = await User.findOne({ [field]: emailPhno }).exec();
-        if (!foundUser) return res.sendStatus(401);
+        if (!foundUser) return res.status(401).json(INVALID_USER);
 
         const match = await bcrypt.compare(pwd, foundUser.password);
-        if (!match) return res.sendStatus(401);
+        if (!match) return res.status(401).json(INVALID_USER);
         if(!foundUser.verified) return res.status(401).json({message: "Email id is not verified"});
 
         const roles = Object.values(foundUser.roles).filter(Boolean);

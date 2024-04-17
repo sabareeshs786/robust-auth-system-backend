@@ -9,12 +9,12 @@ const handleLogout = async (req, res) => {
         const cookies = req.cookies;
         if (!cookies?.jwt) return res204(res);
         const refreshToken = cookies.jwt;
-
+        
         const foundUser = await User.findOne({ refreshToken }).exec();
         if (!foundUser) {
             res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
             res.json({ accessToken: '' });
-            return res.status(204).json({ "message": "You are logged out successfully!!!" });
+            return res.status(204);
         }
 
         foundUser.refreshToken = '';
@@ -22,7 +22,7 @@ const handleLogout = async (req, res) => {
         if (!result) return res500(res);
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
         res.json({ accessToken: '' });
-        return res.status(204).json({ "message": "You are logged out successfully" });
+        return res.status(204);
     }
     catch (err) {
         errorLogger(err);

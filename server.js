@@ -39,7 +39,7 @@ app.use(cookieParser());
 app.post('/signup', signupController.handleNewUser);
 app.post('/login', loginController.handleLogin);
 app.get('/refresh', refreshController.handleRefreshToken);
-app.get('/logout', logoutController.handleLogout);
+app.post('/logout', logoutController.handleLogout);
 app.post('/verify', verificationController.handleVerification);
 app.post('/forgot-password', forgotPasswordController.handleForgotPassword);
 app.post('/verify-forgot-password-code', verificationController.handleForgotPasswordCode);
