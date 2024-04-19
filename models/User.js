@@ -12,14 +12,16 @@ const userSchema = new Schema({
     required: function() {
       return !this.phno || this.phno.length === 0;
     },
-    unique: true
+    unique: true,
+    sparse: true
   },
   phno: {
     type: String,
     required: function() {
       return !this.email || this.email.length === 0;
     },
-    unique: true
+    unique: true,
+    sparse: true
   },
   roles: {
     User: {
