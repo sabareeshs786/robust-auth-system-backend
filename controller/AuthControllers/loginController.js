@@ -18,7 +18,8 @@ const handleLogin = async (req, res) => {
 
         const match = await bcrypt.compare(pwd, foundUser.password);
         if (!match) return res.status(401).json(INVALID_USER);
-        if(!foundUser.verified) return res.status(401).json({message: "Email id is not verified"});
+        const verified = field === "email" ? foundUser.verifiedEmail : foundUser.verifiedPhno;
+        if(!verified) return res.status(401).json({message: "Email id is not verified"});
 
         const roles = Object.values(foundUser.roles).filter(Boolean);
 

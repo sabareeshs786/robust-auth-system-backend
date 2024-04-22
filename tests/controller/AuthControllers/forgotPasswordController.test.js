@@ -7,7 +7,7 @@ const { getRefreshToken } = require('../../../utils/getTokens');
 
 const createUser = async () => {
     const refreshToken = getRefreshToken(1);
-    const user = new User({userid: 1, email: process.env.TEST_EMAIL_ID, roles: {User: 2001345}, password: "Password@123",refreshToken: refreshToken, verified: true });
+    const user = new User({userid: 1, email: process.env.TEST_EMAIL_ID, roles: {User: 2001345}, password: "Password@123",refreshToken: refreshToken, verifiedEmail: true });
     await user.save();
     return {user, refreshToken};
 }
@@ -65,8 +65,8 @@ describe('handleForgotPassword', () => {
 
         await handleForgotPassword(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.status().json).toHaveBeenCalledWith({message: "User not found"});
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status().json).toHaveBeenCalledWith({message: "Verification code is sent"});
     });
 
     it('should handle forgot password for existing user', async () => {

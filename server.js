@@ -21,6 +21,7 @@ const refreshController = require('./controller/AuthControllers/refreshTokenCont
 const forgotPasswordController = require('./controller/AuthControllers/forgotPasswordController');
 const resetPasswordController = require('./controller/AuthControllers/resetPasswordController');
 const verificationController = require('./controller/AuthControllers/verifyController');
+const mfaController = require('./controller/AuthControllers/mfaController');
 const sendSmsController = require('./controller/AuthControllers/sendSmsController');
 const deleteController = require('./controller/deleteController');
 const { addAdmin } = require('./config/addAdmin');
@@ -46,6 +47,7 @@ app.post('/forgot-password', forgotPasswordController.handleForgotPassword);
 app.post('/verify-forgot-password-code', verificationController.handleForgotPasswordCode);
 app.post('/reset-password', resetPasswordController.handleResetPassword);
 app.post('/resend', verificationController.handleResendVC);
+app.post('verify-mfa', mfaController.handleVerifyMfa);
 app.post('/sendsms', sendSmsController.handleSendSms);
 app.delete('/deleteall', deleteController.handleDeleteAll);
 
@@ -57,6 +59,9 @@ app.use(verifyJWT);
 app.use('/users', require('./routes/api/users'));
 app.use('/admin', require('./routes/api/admins'));
 app.use('/profile', require('./routes/api/profile'));
+app.post('/enable-mfa-request', mfaController.handleEnableMfaRequest);
+app.post('/enable-mfa', mfaController.handleEnableMfa);
+app.post('/disable-mfa', mfaController.handleDisableMfa);
 
 app.all('*', (req, res) => {
     res.status(404);

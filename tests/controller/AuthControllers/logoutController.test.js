@@ -3,7 +3,7 @@ require('dotenv').config();
 const { handleLogout } = require('../../../controller/AuthControllers/logoutController');
 const User = require('../../../models/User');
 const createUser = async () => {
-    const user = new User({userid: 1, email: process.env.TEST_EMAIL_ID, roles: {User: 2001345}, password: "Password@123",refreshToken: 'validRefreshToken', verified: true });
+    const user = new User({userid: 1, email: process.env.TEST_EMAIL_ID, roles: {User: 2001345}, password: "Password@123",refreshToken: 'validRefreshToken', verifiedEmail: true });
     return await user.save();
 }
 

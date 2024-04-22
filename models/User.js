@@ -16,7 +16,7 @@ const userSchema = new Schema({
     sparse: true
   },
   phno: {
-    type: String,
+    type: String, // +country_code phone_number
     required: function() {
       return !this.email || this.email.length === 0;
     },
@@ -38,10 +38,24 @@ const userSchema = new Schema({
   refreshToken: {
     type: String,
   },
-  verified:{
+  verifiedEmail:{
     type: Boolean,
     default: false,
     required: true
+  },
+  verifiedPhno: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  mfa : {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  secret : {
+    type: String,
+    default: ""
   },
   superadmin: {
     type: Boolean,

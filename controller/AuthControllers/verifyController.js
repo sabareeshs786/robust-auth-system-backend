@@ -23,20 +23,22 @@ const handleVerification = async (req, res) => {
         const user = await User.findOne({[field] : emailPhno}).exec();
         if(!user)
             throw {code: 401, message: "User not found"};
-        if(user.verified)
-            throw {code: 200, message: "Email already verified"};
+        const verified = field === "email" ? user.verifiedEmail : user.verifiedPhno;
+        if(verified)
+            throw {code: 200, message: `${field === "email" ? "Email id" : "Phone number"} already verified`};
 
         const userid = user.userid;
         const result = await VerificationCodes.findOne({userid}).exec();
         if(!result)
             throw {code: 400, message: "Verification code expired"};
 
+        const verifiedField = field === "email" ? "verifiedEmail": "verifiedPhno";
         if(result?.code === code){
             await User.updateOne(
                 { userid },
                 {   
                     $set: {
-                        verified: true
+                        [verifiedField]: true
                     }
                 },
                 { session }
@@ -114,14 +116,15 @@ const handleResendVC = async (req, res) => {
         if(!field) return res.status(400).json({message: "Invalid input data"});
 
         const user = await User.findOne({[field]: emailPhno}).exec();
-        if(!user) return res.status(400).json({message: `Invalid ${field === "email" ? "Email id" : "Phone number"} entered`});
+        if(!user) return res.status(200).json({message: "Verication code sent successfully"});
         
         const userid = user.userid;
         let verCodeCollection;
         let subject, text;
 
         if(purpose === "emailPhno"){
-            if(user.verified) return res.status(200).json({message: `${field === "email" ? "Email id" : "Phone number"} already verified`});
+            const verified = field === "email" ? user.verifiedEmail : user.verifiedPhno;
+            if(verified) return res.status(200).json({message: `${field === "email" ? "Email id" : "Phone number"} already verified`});
             verCodeCollection = VerificationCodes;
             subject = "Verification code";
             text = `Your ${field === "email" ? "Email id" : "Phone number"} verification code is `;
@@ -158,7 +161,7 @@ const handleResendVC = async (req, res) => {
 
     } catch (err) {
         errorLogger(err);
-        return res.status(500).json({ 'message': "Internal server error occurred!!!\n Try again later" });
+        return res.status(err?.status || 400).json({message: err?.message || "Internal server error occurred!!!\n Try again later"});
     }
 }
 

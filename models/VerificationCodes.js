@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const VerificationCodesSchema = new Schema({
     userid: { type: Number, required: true, unique: true },
     code: { type: String, required: true },
+    mfa: {type:Boolean, default: false},
     createdAt: { type: Date, default: Date.now, expires: 600 } // Expires in 10 minutes
 });
 

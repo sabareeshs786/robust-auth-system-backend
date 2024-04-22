@@ -23,8 +23,9 @@ const handleNewUser = async (req, res) => {
             return res.status(500).json({message: "Invalid input data"});
 
         const duplicate = await User.findOne({ [field]: emailPhno }).exec();
-        if (duplicate && duplicate.verified) return res.status(409).json({ "message": `The entered ${field === "email" ? "Email id" : "Phone number"} is already present` });
-        else if(duplicate && !duplicate.verified)
+        const verified = field === "email" ? duplicate?.verifiedEmail : duplicate?.verifiedPhno;
+        if (duplicate && verified) return res.status(409).json({ "message": `The entered ${field === "email" ? "Email id" : "Phone number"} is already present` });
+        else if(duplicate && !verified)
             return res.status(401).json({message : `${field === "email" ? "Email id" : "Phone number"} is present but not verified`});
 
         const passwordValidity = isPasswordValid(pwd);

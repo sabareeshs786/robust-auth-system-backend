@@ -14,7 +14,7 @@ const handleForgotPassword = async (req, res) => {
         if(!field) return res.status(400).json({message: "Invalid input data"});
         
         const foundUser = await User.findOne({ [field]: emailPhno }).exec();
-        if (!foundUser) return res.status(401).json({message: "User not found"});
+        if (!foundUser) return res.status(200).json({message: "Verification code is sent"});
 
         const userid = foundUser.userid;
 
