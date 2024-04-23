@@ -36,7 +36,7 @@ const handleEnableMfaRequest = async (req, res) => {
                 user.secret = encryptedSecret;
                 const result = await user.save();
                 if(!result) return res500(res);
-                res.status(200).json({ secret: secret.base32, qrCodeUrl: data_url });
+                res.status(200).json({ qrCodeUrl: data_url });
                 return;
             });
             return;
@@ -128,8 +128,8 @@ const handleEnableMfa = async (req, res) => {
     }
 }
 
-const handleSendMFACode = async (req, res) => {
-    const { emailPhno, code } = req.body;
+const handleResendMFACode = async (req, res) => {
+    const { emailPhno } = req.body;
     
 }
 
@@ -162,4 +162,4 @@ const handleDisableMfa = async (req, res) => {
     }
 }
 
-module.exports = { handleEnableMfaRequest, handleEnableMfa, handleSendMFACode, handleVerifyMfa, handleDisableMfa };
+module.exports = { handleEnableMfaRequest, handleEnableMfa, handleResendMFACode, handleVerifyMfa, handleDisableMfa };
