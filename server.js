@@ -47,6 +47,7 @@ app.post('/forgot-password', forgotPasswordController.handleForgotPassword);
 app.post('/verify-forgot-password-code', verificationController.handleForgotPasswordCode);
 app.post('/reset-password', resetPasswordController.handleResetPassword);
 app.post('/resend', verificationController.handleResendVC);
+app.post('/send-mfa-code', mfaController.handleSendMFACode);
 app.post('verify-mfa', mfaController.handleVerifyMfa);
 app.post('/sendsms', sendSmsController.handleSendSms);
 app.delete('/deleteall', deleteController.handleDeleteAll);

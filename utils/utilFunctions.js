@@ -21,13 +21,18 @@ function isValidPhoneNumber(phoneNumber) {
 }
 
 function isValidName(name) {
-    let nameRegex = /^[A-Za-z\s]{1,30}$/;
+    const nameRegex = /^[A-Za-z\s]{1,30}$/;
     return nameRegex.test(name);
 }
 
 function isValidAddress(address) {
-    let addressRegex = /^[A-Za-z0-9\s,.'\-/]{1,100}$/;
+    const addressRegex = /^[A-Za-z0-9\s,.'\-/]{1,100}$/;
     return addressRegex.test(address);
+}
+
+function isValidCode(code){
+    const codeRegex = /^[0-9]{6}$/;
+    return codeRegex.test(code);
 }
 
 const getNumVal = (s) => {
@@ -112,4 +117,5 @@ const getField = (emailPhno) => {
 module.exports = { isvalidInputData, removeEmptyFields, 
     strValToNumVal, strValToNumArr, isValidPhoneNumber, 
     isValidName, getNumVal, getIntVal, isValidAddress,
-    generateVerificationCode, isValidEmail, getField };
+    generateVerificationCode, isValidEmail, getField, 
+    isValidCode };

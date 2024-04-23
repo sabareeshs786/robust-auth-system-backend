@@ -4,7 +4,7 @@ const VerificationCodes = require('../../models/VerificationCodes');
 const FPasswordVerificationCodes = require('../../models/FPasswordVC');
 
 const mongoose = require('mongoose');
-const { generateVerificationCode, getField } = require('../../utils/utilFunctions');
+const { generateVerificationCode, getField, isValidCode } = require('../../utils/utilFunctions');
 const { sendEmail } = require('../../utils/emailSender');
 const { errorLogger } = require('../../middleware/errorHandler');
 const { successLog } = require('../../middleware/logEvents');
@@ -15,7 +15,7 @@ const handleVerification = async (req, res) => {
 
     try {
         const {emailPhno, code} = req.body;
-        if(!emailPhno || !code) throw {code: 400, message: "Invalid input data"};
+        if(!emailPhno || !code || !isValidCode(code)) throw {code: 400, message: "Invalid input data"};
 
         const field = getField(emailPhno);
         if(!field) return res.status(400).json({message: "Invalid input data"});
@@ -74,7 +74,7 @@ const handleVerification = async (req, res) => {
 const handleForgotPasswordCode = async (req, res) => {
     try {
         const {emailPhno, code} = req.body;
-        if(!emailPhno || !code) return res.status(400).json({message: "Invalid input data"});
+        if(!emailPhno || !code || !isValidCode(code)) return res.status(400).json({message: "Invalid input data"});
 
         const field = getField(emailPhno);
         if(!field) return res.status(400).json({message: "Invalid input data"});
