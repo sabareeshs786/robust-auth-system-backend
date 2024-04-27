@@ -48,7 +48,7 @@ app.post('/verify-forgot-password-code', verificationController.handleForgotPass
 app.post('/reset-password', resetPasswordController.handleResetPassword);
 app.post('/resend', verificationController.handleResendVC);
 app.post('/resend-mfa-code', mfaController.handleResendMFACode);
-app.post('verify-mfa', mfaController.handleVerifyMfa);
+app.post('/verify-mfa', mfaController.handleVerifyMfa);
 app.post('/sendsms', sendSmsController.handleSendSms);
 app.delete('/deleteall', deleteController.handleDeleteAll);
 
@@ -62,6 +62,7 @@ app.use('/admin', require('./routes/api/admins'));
 app.use('/profile', require('./routes/api/profile'));
 app.post('/enable-mfa-request', mfaController.handleEnableMfaRequest);
 app.post('/enable-mfa', mfaController.handleEnableMfa);
+app.post('/resend-enable-mfa-code', mfaController.handleResendEnableMFACode);
 app.post('/disable-mfa', mfaController.handleDisableMfa);
 
 app.all('*', (req, res) => {
