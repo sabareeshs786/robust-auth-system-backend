@@ -4,8 +4,10 @@ const userUsersController = require('../../controller/UserControllers/userContro
 const ROLES_LIST = require('../../config/roles_list');
 const verifyRoles = require('../../middleware/verifyRoles');
 
-router.route('/')
+router.route('/getinfo')
     .get(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.User), userUsersController.getUser)
+    
+router.route('/updateinfo')
     .put(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor, ROLES_LIST.User), userUsersController.updateUserAuthDetails)
 
 // router.route('/update')

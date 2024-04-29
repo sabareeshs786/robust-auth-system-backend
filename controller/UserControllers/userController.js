@@ -6,7 +6,7 @@ const getUser = async (req, res) => {
     try {
         const userid = req.userid;
         if (!Number.isInteger(userid)) return res.status(400).json({ "message": 'Invalid input data' });
-        const fields = ['-_id', '-__v', '-refreshToken', '-password', '-userid', '-roles'];
+        const fields = ['-_id', '-__v', '-refreshToken', '-password', '-userid', '-roles', '-secret'];
         const user = await User.findOne({ userid }).select(fields.join(' '));
         if (!user) {
             return res.status(204).json({ 'message': `User ID ${req.params.id} not found` });

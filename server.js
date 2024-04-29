@@ -63,7 +63,9 @@ app.use('/profile', require('./routes/api/profile'));
 app.post('/enable-mfa-request', mfaController.handleEnableMfaRequest);
 app.post('/enable-mfa', mfaController.handleEnableMfa);
 app.post('/resend-enable-mfa-code', mfaController.handleResendEnableMFACode);
+app.post('/disable-mfa-request', mfaController.handleDisableMfaRequest);
 app.post('/disable-mfa', mfaController.handleDisableMfa);
+app.post('/resend-disable-mfa-code', mfaController.handleResendDisableMFACode);
 
 app.all('*', (req, res) => {
     res.status(404);
