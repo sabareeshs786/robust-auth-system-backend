@@ -26,7 +26,7 @@ const handleLogin = async (req, res) => {
         const verified = field === "email" ? foundUser.verifiedEmail : foundUser.verifiedPhno;
         if(!verified) return res.status(401).json({message: "Email id is not verified"});
         if(foundUser.mfa) {
-            if(foundUser.secret !== '') return res.status(200).json({message: "Verify through authentication app", verifyThrough: "authApp"});
+            if(foundUser.secret !== '') return res.status(200).json({message: "Verify your identity", verifyThrough: "authApp"});
             if(foundUser.verifiedEmail) {
                 const code = generateVerificationCode();
                 const isSent = await sendEmail(foundUser.email, "Verification code to login", `Your 2-factor verification code is ${code}`);
@@ -37,7 +37,7 @@ const handleLogin = async (req, res) => {
                     { $set: { userid, code, purpose: "verify" } },
                     { upsert: true, new: true }
                 ).exec();
-                return res.status(200).json({message: "Verification code is sent to your email address successfully", codeSentTo: "email"})
+                return res.status(200).json({message: "Verify your identity", verifyThrough: "email"})
             }
             if(foundUser.verifiedPhno){
                 const code = generateVerificationCode();
@@ -51,7 +51,7 @@ const handleLogin = async (req, res) => {
                     { $set: { userid, code, sentTo: "phno", purpose: "verify" } },
                     { upsert: true, new: true }
                 ).exec();
-                return res.status(200).json({message: "Verification code is sent to your phone number successfully", codeSentTo: "phno"});
+                return res.status(200).json({message: "Verify your identity", verifyThrough: "phno"});
             }
         }
         else{

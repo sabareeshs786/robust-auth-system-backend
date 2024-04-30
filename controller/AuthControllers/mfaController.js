@@ -170,49 +170,102 @@ const handleResendEnableMFACode = async (req, res) => {
     }
 }
 
-const handleResendMFACode = async (req, res) => {
-    const { emailPhno } = req.body;
-    if(!emailPhno) return res.status(400).json({message: "Invalid input data"});
+const handleSendMFACode = async (req, res) => {
+    try {
+        const { emailPhno } = req.body;
+        if(!emailPhno) return res.status(400).json({message: "Invalid input data"});
 
-    const field = getField(emailPhno);
+        const field = getField(emailPhno);
 
-    const user = await User.findOne({ [field] : emailPhno }).exec();
-    const userid = user.userid;
-    if(!user) return res.status(400).json({message: "User doesn't exist"});
-    if(!user?.mfa) return res.status(400).json({message: "MFA is not enabled"});
+        const user = await User.findOne({ [field] : emailPhno }).exec();
+        if(!user) return res.status(400).json({message: "User doesn't exist"});
+        if(!user?.mfa) return res.status(400).json({message: "MFA is not enabled"});
 
-    const vc = await MfaVerificationCodes.findOne({userid}).exec();
-    if(!vc || vc.purpose !== "verify") return res.status(400).json({message: "Invalid request"});
-    
-    if(field === "email"){
-        if(!user?.verifiedEmail) return res.status(400).json({message: "There is no verified email address in your account"});
-        if(vc.sentTo !== "email") return res.status(400).json({message: "Invalid request"});
-        const code = generateVerificationCode();
-        const isSent = await sendEmail(user.email, "Verification code to login", `Your 2-factor verification code is ${code}`);
-        if(!isSent)
-            throw {code: 401, message: "Can't send verification code to your email address"};
-        await MfaVerificationCodes.findOneAndUpdate(
-            { userid },
-            { $set: { userid, code, purpose: "verify" } },
-            { upsert: true, new: true }
-        ).exec();
-        return res.status(200).json({message: "Verification code sent successfully"});
-    }
-    if(field === "phno"){
-        if(!user?.verifiedPhno) return res.status(400).json({message: "There is no verified phone number in your account"});
-        if(vc.sentTo !== "phno") return res.status(400).json({message: "Invalid request"});
-        const code = generateVerificationCode();
-        const phno = user.phno.replace(/\s/g, '');
-        const isSent = await sendSms(phno, `Your 2-factor verification code is ${code}`);
-        if(!isSent){
-            throw {code: 401, message: "Can't send SMS"};
+        const userid = user.userid;
+        
+        if(field === "email"){
+            if(!user?.verifiedEmail) return res.status(400).json({message: "There is no verified email address in your account"});
+            const code = generateVerificationCode();
+            const isSent = await sendEmail(user.email, "Verification code to login", `Your 2-factor verification code is ${code}`);
+            if(!isSent)
+                throw {code: 401, message: "Can't send verification code to your email address"};
+            await MfaVerificationCodes.findOneAndUpdate(
+                { userid },
+                { $set: { userid, code, purpose: "verify" } },
+                { upsert: true, new: true }
+            ).exec();
+            return res.status(200).json({message: "Verification code sent successfully"});
         }
-        await MfaVerificationCodes.findOneAndUpdate(
-            { userid },
-            { $set: { userid, code, sentTo: "phno", purpose: "verify" } },
-            { upsert: true, new: true }
-        ).exec();
-        return res.status(200).json({message: "Verification code sent successfully"});
+        if(field === "phno"){
+            if(!user?.verifiedPhno) return res.status(400).json({message: "There is no verified phone number in your account"});
+            const code = generateVerificationCode();
+            const phno = user.phno.replace(/\s/g, '');
+            const isSent = await sendSms(phno, `Your 2-factor verification code is ${code}`);
+            if(!isSent){
+                throw {code: 401, message: "Can't send SMS"};
+            }
+            await MfaVerificationCodes.findOneAndUpdate(
+                { userid },
+                { $set: { userid, code, sentTo: "phno", purpose: "verify" } },
+                { upsert: true, new: true }
+            ).exec();
+            return res.status(200).json({message: "Verification code sent successfully"});
+        }
+    } catch (err) {
+        errorLogger(err);
+        return res.status(500).json({message: "Internal server error"});
+    }
+}
+
+const handleResendMFACode = async (req, res) => {
+    try {
+        const { emailPhno } = req.body;
+        if(!emailPhno) return res.status(400).json({message: "Invalid input data"});
+
+        const field = getField(emailPhno);
+
+        const user = await User.findOne({ [field] : emailPhno }).exec();
+        if(!user) return res.status(400).json({message: "User doesn't exist"});
+        if(!user?.mfa) return res.status(400).json({message: "MFA is not enabled"});
+
+        const userid = user.userid;
+
+        const vc = await MfaVerificationCodes.findOne({userid}).exec();
+        if(!vc || vc.purpose !== "verify") return res.status(400).json({message: "Invalid request"});
+        
+        if(field === "email"){
+            if(!user?.verifiedEmail) return res.status(400).json({message: "There is no verified email address in your account"});
+            if(vc.sentTo !== "email") return res.status(400).json({message: "Invalid request"});
+            const code = generateVerificationCode();
+            const isSent = await sendEmail(user.email, "Verification code to login", `Your 2-factor verification code is ${code}`);
+            if(!isSent)
+                throw {code: 401, message: "Can't send verification code to your email address"};
+            await MfaVerificationCodes.findOneAndUpdate(
+                { userid },
+                { $set: { userid, code, purpose: "verify" } },
+                { upsert: true, new: true }
+            ).exec();
+            return res.status(200).json({message: "Verification code sent successfully"});
+        }
+        if(field === "phno"){
+            if(!user?.verifiedPhno) return res.status(400).json({message: "There is no verified phone number in your account"});
+            if(vc.sentTo !== "phno") return res.status(400).json({message: "Invalid request"});
+            const code = generateVerificationCode();
+            const phno = user.phno.replace(/\s/g, '');
+            const isSent = await sendSms(phno, `Your 2-factor verification code is ${code}`);
+            if(!isSent){
+                throw {code: 401, message: "Can't send SMS"};
+            }
+            await MfaVerificationCodes.findOneAndUpdate(
+                { userid },
+                { $set: { userid, code, sentTo: "phno", purpose: "verify" } },
+                { upsert: true, new: true }
+            ).exec();
+            return res.status(200).json({message: "Verification code sent successfully"});
+        }
+    } catch (err) {
+        errorLogger(err);
+        return res.status(500).json({message: "Internal server error"});
     }
 }
 
@@ -388,4 +441,4 @@ const handleResendDisableMFACode = async (req, res) => {
     }
 }
 
-module.exports = { handleEnableMfaRequest, handleEnableMfa, handleResendEnableMFACode, handleResendMFACode, handleVerifyMfa, handleDisableMfaRequest, handleDisableMfa, handleResendDisableMFACode };
+module.exports = { handleEnableMfaRequest, handleEnableMfa, handleResendEnableMFACode, handleSendMFACode, handleResendMFACode, handleVerifyMfa, handleDisableMfaRequest, handleDisableMfa, handleResendDisableMFACode };
