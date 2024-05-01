@@ -1,5 +1,5 @@
 # Robust Auth System - Backend
-This is a generic authentication and authorization system that can be used in any MERN stack projects. The frontend micrservice is available at [Robust Auth System - Frontend](https://github.com/sabareeshs786/robust-auth-system-ui) Go to bottom to see the features implemented in this Node.Js application
+This is a generic authentication and authorization system that can be used in any MERN stack projects. The frontend micrservice is available at [Robust Auth System - Frontend](https://github.com/sabareeshs786/robust-auth-system-ui). Go to bottom to see the features implemented in this Node.Js application
 
 ---
 ## Requirements
