@@ -78,13 +78,13 @@ Open `.env` file then inject your credentials so it looks like this
     $ node
     > require('crypto').randomBytes(16).toString('base64')
 
-### To obtain DATABASE_URI refer to https://www.youtube.com/watch?v=UrjZ3qn44uE Sample DATABASE_URI will look as follows:
+### To obtain DATABASE_URI refer to this [youtube video](https://www.youtube.com/watch?v=UrjZ3qn44uE). Sample DATABASE_URI will look something as follows:
 
     DATABASE_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>?retryWrites=true&w=majority
 
 ### To obtain PASSWORD login to your EMAIL_ID which should be a gmail id and get an App password from your account after enabling 2-step verification. 
 
-  Refer to this youtube video https://www.youtube.com/watch?v=hXiPshHn9Pw to get the app password. This app password is the PASSWORD that must be entered for the corresponding EMAIL_ID which is a gmail id. From this gmail id only the verifications codes will be sent for the verification purposes such as verifying email ids while signing up, resetting password etc.,
+  Refer to this [youtube video](https://www.youtube.com/watch?v=hXiPshHn9Pw) to get the app password. This app password is the PASSWORD that must be entered for the corresponding EMAIL_ID which is a gmail id. From this gmail id only the verifications codes will be sent for the verification purposes such as verifying email ids while signing up, resetting password etc.,
 
 ### To obtain AWS_ACCESS_KEY, AWS_SECRET_KEY for the purpose of sending SMS to the phone numbers using AWS SNS refer to https://www.youtube.com/watch?v=18LSoIt7hKY 
 
