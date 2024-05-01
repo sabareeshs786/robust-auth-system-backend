@@ -86,7 +86,7 @@ Open `.env` file then inject your credentials so it looks like this
 
   Refer to this [youtube video](https://www.youtube.com/watch?v=hXiPshHn9Pw) to get the app password. This app password is the PASSWORD that must be entered for the corresponding EMAIL_ID which is a gmail id. From this gmail id only the verifications codes will be sent for the verification purposes such as verifying email ids while signing up, resetting password etc.,
 
-### To obtain AWS_ACCESS_KEY, AWS_SECRET_KEY for the purpose of sending SMS to the phone numbers using AWS SNS refer to https://www.youtube.com/watch?v=18LSoIt7hKY 
+### To obtain AWS_ACCESS_KEY, AWS_SECRET_KEY for the purpose of sending SMS to the phone numbers using AWS SNS refer [here](https://www.youtube.com/watch?v=18LSoIt7hKY)
 
   In order to send/receive SMS through AWS SNS, you have to add your phone number to the Sandbox destination phone numbers under Mobile -> Text messaging (SMS) in Amazon SNS management console.
 
