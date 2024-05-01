@@ -61,7 +61,7 @@ Open `.env` file then inject your credentials so it looks like this
     AWS_REGION=<YOUR_AWS_REGION>
     TEST_EMAIL_ID=<YOUR_TEST_EMAIL_ID>
 
-## How to obtain credentials to add to the above `.env` file
+## How to obtain credentials to add to the above `.env` file?
 
 ### To obtain the ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET run the following command:
 
@@ -111,3 +111,4 @@ Open `.env` file then inject your credentials so it looks like this
   - ### Authenticator app can be used for the MFA after scanning the QR code that is displayed and entering the 6-digit code
   - ### User email address can also be used for the MFA. The 6-digit verification code will be sent to registered email address whenever a login is attempted
   - ### To disable MFA, the identity of the user is verified again with the verification code that is sent to the registered email address of the user
+  - ### Both frontend and backend microservices are Dockerized
